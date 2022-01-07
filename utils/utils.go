@@ -50,9 +50,13 @@ func ExtractSubdomain(url string) string {
 		return result.Sub
 
 	} else {
-
-		return result.Root
+		return ""
 	}
+	// Let's first remove this, dont remember why i returned the root instead.
+	// else {
+
+	// 	return result.Root
+	// }
 }
 
 func SplitSubToWords(subdomain string) []string {
