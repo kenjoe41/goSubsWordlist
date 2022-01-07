@@ -38,7 +38,7 @@ func main() {
 				continue
 			}
 
-			subdomain := utils.ExtractSubdomain(domain)
+			subdomain := utils.ExtractSubdomain(domain, *includeRoot)
 
 			if subdomain == "" {
 				// Log something but continue to next domain if available
@@ -47,10 +47,6 @@ func main() {
 			}
 
 			subdomains <- subdomain
-
-			if *includeRoot {
-				subdomains <- domain
-			}
 
 		}
 		domainsWG.Done()

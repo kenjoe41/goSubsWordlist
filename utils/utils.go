@@ -39,18 +39,25 @@ func CleanDomain(dmn string) string {
 	}
 }
 
-func ExtractSubdomain(url string) string {
+func ExtractSubdomain(url string, includeRootPtr bool) string {
 
 	cache := "/tmp/tldsub.cache"
 	extract, _ := tldextract.New(cache, false)
 
 	result := extract.Extract(url)
 	if len(result.Sub) > 0 {
-
-		return result.Sub
+		if includeRootPtr {
+			return result.Sub + "." + result.Root
+		} else {
+			return result.Sub
+		}
 
 	} else {
-		return ""
+		if includeRootPtr {
+			return result.Root
+		} else {
+			return ""
+		}
 	}
 }
 
