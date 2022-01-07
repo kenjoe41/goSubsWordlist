@@ -38,7 +38,12 @@ func main() {
 		// Split the subdomain into separate words by the '.' char.
 		// Returns slice of words.
 		subWords := utils.SplitSubToWords(subdomain)
-		fmt.Println(subWords)
+		// fmt.Println(subWords)
+
+		// Print to console for now
+		for _, subword := range subWords {
+			fmt.Println(subword)
+		}
 
 		// check there were no errors reading stdin (unlikely)
 		if err := sc.Err(); err != nil {
