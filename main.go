@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -12,6 +13,9 @@ import (
 )
 
 func main() {
+
+	// Include the Root Domain names in words
+	includeRoot := flag.Bool("iR", false, "Include root domain names in wordlist.")
 
 	// Create channels to use
 	domains := make(chan string)
@@ -29,7 +33,7 @@ func main() {
 
 			if domain == "" {
 				// Log something but continue to next domain if available
-				log.Printf("Failed to get domain from: %s", domain)
+				// log.Printf("Failed to get domain from: %s", domain)
 				continue
 			}
 
@@ -37,11 +41,15 @@ func main() {
 
 			if subdomain == "" {
 				// Log something but continue to next domain if available
-				log.Printf("Failed to get subdomain for domain: %s", domain)
+				// log.Printf("Failed to get subdomain for domain: %s", domain)
 				continue
 			}
 
 			subdomains <- subdomain
+
+			if *includeRoot {
+				subdomains <- domain
+			}
 
 		}
 		domainsWG.Done()
