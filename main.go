@@ -9,6 +9,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/kenjoe41/goSubsWordlist/output"
 	"github.com/kenjoe41/goSubsWordlist/utils"
 )
 
@@ -16,7 +17,15 @@ func main() {
 
 	// Include the Root Domain names in words
 	includeRoot := flag.Bool("iR", false, "Include root domain names in wordlist.")
+	help := flag.Bool("h", false, "Print the help.")
+
 	flag.Parse()
+
+	// Print help message
+	if *help {
+		output.PrintHelp()
+		os.Exit(0)
+	}
 
 	// Create channels to use
 	domains := make(chan string)
