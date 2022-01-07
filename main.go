@@ -77,6 +77,7 @@ func main() {
 		for word := range output {
 			fmt.Println(word)
 		}
+		outputWG.Done()
 	}()
 
 	// Close the Output Chan after subdomain worker is done.
