@@ -56,6 +56,6 @@ func ExtractSubdomain(url string) string {
 }
 
 func SplitSubToWords(subdomain string) []string {
-	subWords := strings.Split(subdomain, ".")
+	subWords := strings.SplitAfter(subdomain, ".")
 	return subWords
 }
