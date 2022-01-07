@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"log"
 	"net/url"
 	"regexp"
@@ -31,8 +30,7 @@ func CleanDomain(dmn string) string {
 			if match != "" {
 				return match
 			}
-			// fmt.Println("We have no match")
-
+			// We have no match
 			return ""
 
 		} else {
@@ -43,14 +41,21 @@ func CleanDomain(dmn string) string {
 
 func ExtractSubdomain(url string) string {
 
-	cache := "/tmp/tld.cache"
+	cache := "/tmp/tldsub.cache"
 	extract, _ := tldextract.New(cache, false)
 
 	result := extract.Extract(url)
 	if len(result.Sub) > 0 {
-		fmt.Println(result.Sub)
+
 		return result.Sub
+
 	} else {
+
 		return result.Root
 	}
+}
+
+func SplitSubToWords(subdomain string) []string {
+	subWords := strings.Split(subdomain, ".")
+	return subWords
 }

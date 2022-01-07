@@ -19,10 +19,26 @@ func main() {
 
 		domain := utils.CleanDomain(scDomain)
 
-		fmt.Println(domain)
+		// fmt.Println(domain)
+
+		if domain == "" {
+			// Log something but continue to next domain if available
+			log.Printf("Failed to get domain from: %s", scDomain)
+			continue
+		}
 
 		subdomain := utils.ExtractSubdomain(domain)
-		fmt.Println(subdomain)
+
+		if subdomain == "" {
+			// Log something but continue to next domain if available
+			log.Printf("Failed to get subdomain for domain: %s", domain)
+			continue
+		}
+
+		// Split the subdomain into separate words by the '.' char.
+		// Returns slice of words.
+		subWords := utils.SplitSubToWords(subdomain)
+		fmt.Println(subWords)
 
 		// check there were no errors reading stdin (unlikely)
 		if err := sc.Err(); err != nil {
