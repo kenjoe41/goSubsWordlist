@@ -4,7 +4,7 @@ This list can be used for further bruteforcing for more subdomains.
 
 ## Install
 To install:
-`go install -v github.com/kenjoe41/goSubsWordlist@latest`
+```go install -v github.com/kenjoe41/goSubsWordlist@latest```
 
 ## TODO
 I plan to add:
