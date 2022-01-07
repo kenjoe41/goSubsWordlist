@@ -16,6 +16,7 @@ func main() {
 
 	// Include the Root Domain names in words
 	includeRoot := flag.Bool("iR", false, "Include root domain names in wordlist.")
+	flag.Parse()
 
 	// Create channels to use
 	domains := make(chan string)
