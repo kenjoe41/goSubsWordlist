@@ -5,7 +5,7 @@ This list can be used for further bruteforcing for more subdomains.
 ## Install
 To install:
 
-```text
+```
 go install -v github.com/kenjoe41/goSubsWordlist@latest
 ```
 

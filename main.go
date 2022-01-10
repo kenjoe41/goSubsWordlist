@@ -16,13 +16,21 @@ import (
 func main() {
 
 	// Include the Root Domain names in words
-	includeRoot := flag.Bool("iR", false, "Include root domain names in wordlist.")
-	help := flag.Bool("h", false, "Print the help.")
+	var includeRoot bool
+	flag.BoolVar(&includeRoot, "iR", false, "Include root domain names in wordlist.")
+
+	// Concurrency flag
+	var concurrency int
+	flag.IntVar(&concurrency, "t", 20, "Threads for concurrency. Default is 20.")
+
+	// Print help message
+	var help bool
+	flag.BoolVar(&help, "h", false, "Print the help.")
 
 	flag.Parse()
 
 	// Print help message
-	if *help {
+	if help {
 		output.PrintHelp()
 		os.Exit(0)
 	}
@@ -34,50 +42,60 @@ func main() {
 
 	// Domain Input worker
 	var domainsWG sync.WaitGroup
-	domainsWG.Add(1)
-	go func() {
-		for inDomain := range domains {
-			inDomain = strings.TrimSpace(strings.ToLower(inDomain))
+	for i := 0; i < concurrency/2; i++ {
 
-			domain := utils.CleanDomain(inDomain)
+		domainsWG.Add(1)
 
-			if domain == "" {
-				// Log something but continue to next domain if available
-				// log.Printf("Failed to get domain from: %s", domain)
-				continue
+		go func() {
+			for inDomain := range domains {
+				inDomain = strings.TrimSpace(strings.ToLower(inDomain))
+
+				domain := utils.CleanDomain(inDomain)
+
+				if domain == "" {
+					// Log something but continue to next domain if available
+					// log.Printf("Failed to get domain from: %s", domain)
+					continue
+				}
+
+				subdomain := utils.ExtractSubdomain(domain, includeRoot)
+
+				if subdomain == "" {
+					// Log something but continue to next domain if available
+					// log.Printf("Failed to get subdomain for domain: %s", domain)
+					continue
+				}
+
+				subdomains <- subdomain
+
 			}
-
-			subdomain := utils.ExtractSubdomain(domain, *includeRoot)
-
-			if subdomain == "" {
-				// Log something but continue to next domain if available
-				// log.Printf("Failed to get subdomain for domain: %s", domain)
-				continue
-			}
-
-			subdomains <- subdomain
-
-		}
-		domainsWG.Done()
-	}()
+			domainsWG.Done()
+		}()
+	}
 
 	var subdomainsWG sync.WaitGroup
-	subdomainsWG.Add(1)
-	go func() {
-		for inSubdomains := range subdomains {
 
-			// Split the subdomain into separate words by the '.' char.
-			// Returns slice of words.
-			subWords := utils.SplitSubToWords(inSubdomains)
+	for i := 0; i < concurrency/2; i++ {
 
-			// Print to console for now
-			for _, subword := range subWords {
-				output <- subword
+		subdomainsWG.Add(1)
+
+		go func() {
+			for inSubdomains := range subdomains {
+
+				// Split the subdomain into separate words by the '.' char.
+				// Returns slice of words.
+				subWords := utils.SplitSubToWords(inSubdomains)
+
+				// Print to console for now
+				for _, subword := range subWords {
+					output <- subword
+				}
+
 			}
+			subdomainsWG.Done()
+		}()
 
-		}
-		subdomainsWG.Done()
-	}()
+	}
 
 	// Close subdomains channel when done reading from domains chan.
 	go func() {

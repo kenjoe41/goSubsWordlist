@@ -6,8 +6,10 @@ import "fmt"
 func PrintHelp() {
 	Beautify()
 	fmt.Println(`Usage of goSubsWordlist:
-	-iR bool
+	-iR Bool
 		Include Root Domain names in wordlist output.
+	-t Int
+		Threads for Concurrency. Default is 8.
 	-help
 		Print this help message.`)
 }
