@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime"
 	"strings"
 	"sync"
 
@@ -21,30 +22,12 @@ func main() {
 
 	// Concurrency flag
 	var concurrency int
-	flag.IntVar(&concurrency, "t", 20, "Threads for concurrency. Default is 20.")
-
-	// Print help message
-	var help bool
-	flag.BoolVar(&help, "h", false, "Print the help.")
+	flag.IntVar(&concurrency, "t", runtime.NumCPU(), "Threads for concurrency. Default is current available logical CPUs available to this process.")
 
 	flag.Parse()
 
-	// Print help message
-	if help {
-		output.PrintHelp()
-		os.Exit(0)
-	}
-
 	// Print Header text
 	output.Beautify()
-
-	// Let's start off with checking if we have Input before we do anything.
-	// Check for stdin input
-	stat, _ := os.Stdin.Stat()
-	if (stat.Mode() & os.ModeCharDevice) != 0 {
-		fmt.Fprintln(os.Stderr, "No urls detected. Hint: cat urls.txt | hakrawler")
-		os.Exit(1)
-	}
 
 	// Create channels to use
 	domains := make(chan string)
@@ -131,10 +114,16 @@ func main() {
 
 	sc := bufio.NewScanner(os.Stdin)
 
+	var inputItem bool
 	for sc.Scan() {
 
 		domains <- sc.Text()
+		inputItem = true
+	}
 
+	if !inputItem {
+		fmt.Fprintln(os.Stderr, "No domains or urls detected. Hint: cat domains.txt | goSubsWordlist")
+		flag.Usage()
 	}
 
 	// Close domains chan
