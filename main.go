@@ -35,6 +35,17 @@ func main() {
 		os.Exit(0)
 	}
 
+	// Print Header text
+	output.Beautify()
+
+	// Let's start off with checking if we have Input before we do anything.
+	// Check for stdin input
+	stat, _ := os.Stdin.Stat()
+	if (stat.Mode() & os.ModeCharDevice) != 0 {
+		fmt.Fprintln(os.Stderr, "No urls detected. Hint: cat urls.txt | hakrawler")
+		os.Exit(1)
+	}
+
 	// Create channels to use
 	domains := make(chan string)
 	subdomains := make(chan string)
