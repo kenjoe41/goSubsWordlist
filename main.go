@@ -29,6 +29,11 @@ func main() {
 	// Print Header text
 	output.Beautify()
 
+	// This is divided up in the subroutine for loop, so a value below 2 is BS.
+	if concurrency <= 1 {
+		concurrency = 2
+	}
+
 	// Create channels to use
 	domains := make(chan string)
 	subdomains := make(chan string)
