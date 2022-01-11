@@ -10,8 +10,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/kenjoe41/goSubsWordlist/ezUtils"
 	"github.com/kenjoe41/goSubsWordlist/output"
-	"github.com/kenjoe41/goSubsWordlist/utils"
 )
 
 func main() {
@@ -49,7 +49,7 @@ func main() {
 			for inDomain := range domains {
 				inDomain = strings.TrimSpace(strings.ToLower(inDomain))
 
-				domain := utils.CleanDomain(inDomain)
+				domain := ezUtils.CleanDomain(inDomain)
 
 				if domain == "" {
 					// Log something but continue to next domain if available
@@ -57,7 +57,7 @@ func main() {
 					continue
 				}
 
-				subdomain := utils.ExtractSubdomain(domain, includeRoot)
+				subdomain := ezUtils.ExtractSubdomain(domain, includeRoot)
 
 				if subdomain == "" {
 					// Log something but continue to next domain if available
@@ -83,7 +83,7 @@ func main() {
 
 				// Split the subdomain into separate words by the '.' char.
 				// Returns slice of words.
-				subWords := utils.SplitSubToWords(inSubdomains)
+				subWords := ezUtils.SplitSubToWords(inSubdomains)
 
 				// Print to console for now
 				for _, subword := range subWords {

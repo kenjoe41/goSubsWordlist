@@ -1,4 +1,4 @@
-package utils
+package ezUtils
 
 import (
 	"log"
