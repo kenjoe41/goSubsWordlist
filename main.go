@@ -10,12 +10,12 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/kenjoe41/goSubsWordlist/ezUtils"
+	"github.com/kenjoe41/goSubsWordlist/ezutils"
 	"github.com/kenjoe41/goSubsWordlist/output"
 )
 
 func main() {
-	
+
 	// Print Header text
 	output.Beautify()
 
@@ -28,7 +28,6 @@ func main() {
 	flag.IntVar(&concurrency, "t", runtime.NumCPU(), "Threads for concurrency. Default is current available logical CPUs available to this process.")
 
 	flag.Parse()
-
 
 	// This is divided up in the subroutine for loop, so a value below 2 is BS.
 	if concurrency <= 1 {
@@ -53,7 +52,7 @@ func main() {
 			for inDomain := range domains {
 				inDomain = strings.TrimSpace(strings.ToLower(inDomain))
 
-				domain := ezUtils.CleanDomain(inDomain)
+				domain := ezutils.CleanDomain(inDomain)
 
 				if domain == "" {
 					// Log something but continue to next domain if available
@@ -61,7 +60,7 @@ func main() {
 					continue
 				}
 
-				subdomain := ezUtils.ExtractSubdomain(domain, includeRoot)
+				subdomain := ezutils.ExtractSubdomain(domain, includeRoot)
 
 				if subdomain == "" {
 					// Log something but continue to next domain if available
@@ -87,7 +86,7 @@ func main() {
 
 				// Split the subdomain into separate words by the '.' char.
 				// Returns slice of words.
-				subWords := ezUtils.SplitSubToWords(inSubdomains)
+				subWords := ezutils.SplitSubToWords(inSubdomains)
 
 				// Print to console for now
 				for _, subword := range subWords {
