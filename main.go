@@ -15,6 +15,9 @@ import (
 )
 
 func main() {
+	
+	// Print Header text
+	output.Beautify()
 
 	// Include the Root Domain names in words
 	var includeRoot bool
@@ -26,12 +29,13 @@ func main() {
 
 	flag.Parse()
 
-	// Print Header text
-	output.Beautify()
 
 	// This is divided up in the subroutine for loop, so a value below 2 is BS.
 	if concurrency <= 1 {
 		concurrency = 2
+	} else {
+		// We have 2 channels to share the concurrency with, let's reassure them that they'll have equal share.
+		concurrency = concurrency * 2
 	}
 
 	// Create channels to use
