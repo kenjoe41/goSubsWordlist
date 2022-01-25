@@ -24,10 +24,13 @@ func main() {
 	flag.BoolVar(&includeRoot, "iR", false, "Include root domain names in wordlist.")
 
 	// Concurrency flag
-	var concurrency int
-	flag.IntVar(&concurrency, "t", runtime.NumCPU(), "Threads for concurrency. Default is current available logical CPUs available to this process.")
+	// var concurrency int
+	// flag.IntVar(&concurrency, "t", runtime.NumCPU(), "Threads for concurrency. Default is current available logical CPUs available to this process.")
 
 	flag.Parse()
+
+	// This is a CPU-bound task, increasing the threads beyond whats vailable will just make it slow so removed the flag option.
+	concurrency := runtime.NumCPU()
 
 	// This is divided up in the subroutine for loop, so a value below 2 is BS.
 	if concurrency <= 1 {
