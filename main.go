@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"runtime"
+	"strings"
 	"sync"
 
 	"github.com/elliotwutingfeng/go-fasttld"
@@ -50,7 +51,10 @@ func main() {
 		domainsWG.Add(1)
 
 		go func() {
-			extract, _ := fasttld.New(fasttld.SuffixListParams{})
+			extract, err := fasttld.New(fasttld.SuffixListParams{})
+			if err != nil {
+				log.Fatal(err)
+			}
 			for domain := range domains {
 				if domain == "" {
 					// Log something but continue to next domain if available
@@ -79,7 +83,7 @@ func main() {
 			for inSubdomains := range subdomains {
 				// Split the subdomain into separate words by the '.' char.
 				// Returns slice of words.
-				subWords := ezutils.SplitOnDot(inSubdomains)
+				subWords := strings.Split(inSubdomains, ".")
 
 				// Print to console for now
 				for _, subword := range subWords {
