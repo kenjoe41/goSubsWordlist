@@ -39,3 +39,12 @@ func TestExtractSubdomain(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkExtractSubdomain(b *testing.B) {
+	extract, _ := fasttld.New(fasttld.SuffixListParams{})
+	b.Run("ExtractSubdomain", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			ExtractSubdomain("a.b.c.d.e.example.com", false, extract)
+		}
+	})
+}

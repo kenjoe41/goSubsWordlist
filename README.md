@@ -19,5 +19,5 @@ go install -v github.com/kenjoe41/goSubsWordlist@latest
 ## TODO
 
 I plan to add:
-    ..* `top N` flag. Outputs only most reoccurring word upto the Nth number like `-top 1000`.
+    ..* `top N` flag. Outputs only most reoccurring word up to the Nth number like `-top 1000`.
         Might require in-memory tracking of word occurrence, might not be efficient for xx-large huge subdomain lists.
