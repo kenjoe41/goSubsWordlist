@@ -10,12 +10,12 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/joeguo/tldextract"
 	"github.com/kenjoe41/goSubsWordlist/ezutils"
 	"github.com/kenjoe41/goSubsWordlist/output"
 )
 
 func main() {
-
 	// Print Header text
 	output.Beautify()
 
@@ -52,6 +52,8 @@ func main() {
 		domainsWG.Add(1)
 
 		go func() {
+			cache := "/tmp/tldsub.cache"
+			extract, _ := tldextract.New(cache, false)
 			for inDomain := range domains {
 				inDomain = strings.TrimSpace(strings.ToLower(inDomain))
 
@@ -63,7 +65,7 @@ func main() {
 					continue
 				}
 
-				subdomain := ezutils.ExtractSubdomain(domain, includeRoot)
+				subdomain := ezutils.ExtractSubdomain(domain, includeRoot, extract)
 
 				if subdomain == "" {
 					// Log something but continue to next domain if available
