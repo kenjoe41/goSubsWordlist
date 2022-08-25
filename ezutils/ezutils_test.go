@@ -16,10 +16,14 @@ var extractSubdomainTests []extractSubdomainTest = []extractSubdomainTest{
 	{url: "sub.example.com", includeRootPtr: false, expected: "sub"},
 	{url: "sub.sub2.example.com", includeRootPtr: false, expected: "sub.sub2"},
 	{url: "example.com", includeRootPtr: false, expected: ""},
+	{url: "255.255.255.255", includeRootPtr: false, expected: ""},
+	{url: "https://", includeRootPtr: false, expected: ""},
 	{url: "", includeRootPtr: false, expected: ""},
 	{url: "sub.example.com", includeRootPtr: true, expected: "sub.example"},
 	{url: "sub.sub2.example.com", includeRootPtr: true, expected: "sub.sub2.example"},
 	{url: "example.com", includeRootPtr: true, expected: "example"},
+	{url: "255.255.255.255", includeRootPtr: true, expected: ""},
+	{url: "https://", includeRootPtr: true, expected: ""},
 	{url: "", includeRootPtr: true, expected: ""},
 }
 

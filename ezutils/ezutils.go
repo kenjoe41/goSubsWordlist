@@ -1,8 +1,6 @@
 package ezutils
 
 import (
-	"log"
-
 	"github.com/elliotwutingfeng/go-fasttld"
 )
 
@@ -11,7 +9,9 @@ import (
 func ExtractSubdomain(url string, includeRootPtr bool, extract *fasttld.FastTLD) string {
 	result, err := extract.Extract(fasttld.URLParams{URL: url})
 	if err != nil {
-		log.Println(err)
+		return ""
+	}
+	if result.HostType != fasttld.HostName {
 		return ""
 	}
 	if len(result.SubDomain) > 0 {
