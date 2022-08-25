@@ -7,10 +7,9 @@ import (
 	"log"
 	"os"
 	"runtime"
-	"strings"
 	"sync"
 
-	"github.com/joeguo/tldextract"
+	"github.com/elliotwutingfeng/go-fasttld"
 	"github.com/kenjoe41/goSubsWordlist/ezutils"
 	"github.com/kenjoe41/goSubsWordlist/output"
 )
@@ -48,23 +47,16 @@ func main() {
 	// Domain Input worker
 	var domainsWG sync.WaitGroup
 	for i := 0; i < concurrency/2; i++ {
-
 		domainsWG.Add(1)
 
 		go func() {
-			cache := "/tmp/tldsub.cache"
-			extract, _ := tldextract.New(cache, false)
-			for inDomain := range domains {
-				inDomain = strings.TrimSpace(strings.ToLower(inDomain))
-
-				domain := ezutils.CleanDomain(inDomain)
-
+			extract, _ := fasttld.New(fasttld.SuffixListParams{})
+			for domain := range domains {
 				if domain == "" {
 					// Log something but continue to next domain if available
 					// log.Printf("Failed to get domain from: %s", domain)
 					continue
 				}
-
 				subdomain := ezutils.ExtractSubdomain(domain, includeRoot, extract)
 
 				if subdomain == "" {
@@ -72,9 +64,7 @@ func main() {
 					// log.Printf("Failed to get subdomain for domain: %s", domain)
 					continue
 				}
-
 				subdomains <- subdomain
-
 			}
 			domainsWG.Done()
 		}()
@@ -83,25 +73,21 @@ func main() {
 	var subdomainsWG sync.WaitGroup
 
 	for i := 0; i < concurrency/2; i++ {
-
 		subdomainsWG.Add(1)
 
 		go func() {
 			for inSubdomains := range subdomains {
-
 				// Split the subdomain into separate words by the '.' char.
 				// Returns slice of words.
-				subWords := ezutils.SplitSubToWords(inSubdomains)
+				subWords := ezutils.SplitOnDot(inSubdomains)
 
 				// Print to console for now
 				for _, subword := range subWords {
 					output <- subword
 				}
-
 			}
 			subdomainsWG.Done()
 		}()
-
 	}
 
 	// Close subdomains channel when done reading from domains chan.
