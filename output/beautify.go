@@ -1,12 +1,8 @@
 package output
 
-import (
-	"fmt"
+import "github.com/fatih/color"
 
-	"github.com/fatih/color"
-)
-
-//Beautify prints the banner
+// Beautify prints the banner
 func Beautify() {
 	banner1 := "          __                           \n"
 	banner2 := "    _  _ (_    |_  _|  | _  _ _||. _|_ \n"
@@ -19,6 +15,5 @@ func Beautify() {
 	bannerPart1 := banner1 + banner2 + banner3 + banner4
 	bannerPart2 := banner5 + banner6 + banner7 + banner8
 	color.Cyan("%s\n", bannerPart1)
-	fmt.Println(bannerPart2)
-
+	color.New().Println(bannerPart2)
 }

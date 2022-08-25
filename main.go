@@ -29,7 +29,7 @@ func main() {
 
 	flag.Parse()
 
-	// This is a CPU-bound task, increasing the threads beyond whats vailable will just make it slow so removed the flag option.
+	// This is a CPU-bound task, increasing the threads beyond what's available will just make it slow so removed the flag option.
 	concurrency := runtime.NumCPU()
 
 	// This is divided up in the subroutine for loop, so a value below 2 is BS.
