@@ -16,9 +16,11 @@ import (
 )
 
 // Cli accepts a list of URLs, one URL per line, from stdin and generates a wordlist from all subdomains found in the list.
-func Cli(includeRoot bool) {
+func Cli(includeRoot, silent bool) {
 	// Print Header text
-	output.Beautify()
+	if !silent {
+		output.Beautify()
+	}
 
 	// This is a CPU-bound task, increasing the threads beyond what's available will just make it slow so removed the flag option.
 	concurrency := runtime.NumCPU()
