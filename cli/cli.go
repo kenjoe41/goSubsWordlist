@@ -108,17 +108,18 @@ func Cli(includeRoot, silent bool) {
 		close(output)
 	}()
 
-	sc := bufio.NewScanner(os.Stdin)
-
-	var inputItem bool
-	for sc.Scan() {
-		domains <- sc.Text()
-		inputItem = true
-	}
-
-	if !inputItem {
+	// Check for stdin input
+	stat, _ := os.Stdin.Stat()
+	if (stat.Mode() & os.ModeCharDevice) != 0 {
 		fmt.Fprintln(os.Stderr, "No domains or urls detected. Hint: cat domains.txt | goSubsWordlist")
 		flag.Usage()
+		os.Exit(1)
+	}
+
+	sc := bufio.NewScanner(os.Stdin)
+
+	for sc.Scan() {
+		domains <- sc.Text()
 	}
 
 	// Close domains chan
