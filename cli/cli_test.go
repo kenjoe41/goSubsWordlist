@@ -18,8 +18,7 @@ func TestCLI(t *testing.T) {
 	}
 
 	defer funcDefer()
-	err = Cli(false, false)
-	if err != nil {
+	if err := Cli(false, false); err != nil {
 		t.Errorf("%q", err)
 	}
 }
