@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"log"
 
 	"github.com/kenjoe41/goSubsWordlist/cli"
 )
@@ -16,5 +17,7 @@ func main() {
 	flag.BoolVar(&silent, "silent", false, "Don't print the banner.")
 
 	flag.Parse()
-	cli.Cli(includeRoot, silent)
+	if err := cli.Cli(includeRoot, silent); err != nil {
+		log.Fatal(err)
+	}
 }

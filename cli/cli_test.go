@@ -6,8 +6,6 @@ import (
 )
 
 func TestCLI(t *testing.T) {
-	Cli(false, false)
-
 	userInput := "example.com\nsub.example.com\n\n"
 
 	funcDefer, err := mockStdin(t, userInput)
@@ -16,7 +14,10 @@ func TestCLI(t *testing.T) {
 	}
 
 	defer funcDefer()
-	Cli(false, false)
+	err = Cli(false, false)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 // mockStdin is a helper function that lets the test pretend dummyInput as os.Stdin.

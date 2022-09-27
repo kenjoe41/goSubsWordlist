@@ -16,7 +16,7 @@ import (
 )
 
 // Cli accepts a list of URLs, one URL per line, from stdin and generates a wordlist from all subdomains found in the list.
-func Cli(includeRoot, silent bool) {
+func Cli(includeRoot, silent bool) error {
 	// Print Header text
 	if !silent {
 		output.Beautify()
@@ -127,9 +127,11 @@ func Cli(includeRoot, silent bool) {
 
 	// check there were no errors reading stdin (unlikely)
 	if err := sc.Err(); err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	// Wait until the output waitgroup is done
 	outputWG.Wait()
+
+	return nil
 }
