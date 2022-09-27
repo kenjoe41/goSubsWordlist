@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bufio"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -111,9 +112,8 @@ func Cli(includeRoot, silent bool) error {
 	// Check for stdin input
 	stat, _ := os.Stdin.Stat()
 	if (stat.Mode() & os.ModeCharDevice) != 0 {
-		fmt.Fprintln(os.Stderr, "No domains or urls detected. Hint: cat domains.txt | goSubsWordlist")
 		flag.Usage()
-		os.Exit(1)
+		return errors.New("No domains or urls detected. Hint: cat domains.txt | goSubsWordlist")
 	}
 
 	sc := bufio.NewScanner(os.Stdin)

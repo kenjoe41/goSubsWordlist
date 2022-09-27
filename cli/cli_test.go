@@ -6,17 +6,21 @@ import (
 )
 
 func TestCLI(t *testing.T) {
+	if err := Cli(false, false); err == nil {
+		t.Error("Expected error for no Stdin input")
+	}
+
 	userInput := "example.com\nsub.example.com\n\n"
 
 	funcDefer, err := mockStdin(t, userInput)
 	if err != nil {
-		t.Fatal(err)
+		t.Errorf("%q", err)
 	}
 
 	defer funcDefer()
 	err = Cli(false, false)
 	if err != nil {
-		t.Fatal(err)
+		t.Errorf("%q", err)
 	}
 }
 
