@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bufio"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -16,7 +17,7 @@ import (
 )
 
 // Cli accepts a list of URLs, one URL per line, from stdin and generates a wordlist from all subdomains found in the list.
-func Cli(includeRoot, silent bool) {
+func Cli(includeRoot, silent bool) error {
 	// Print Header text
 	if !silent {
 		output.Beautify()
@@ -111,9 +112,8 @@ func Cli(includeRoot, silent bool) {
 	// Check for stdin input
 	stat, _ := os.Stdin.Stat()
 	if (stat.Mode() & os.ModeCharDevice) != 0 {
-		fmt.Fprintln(os.Stderr, "No domains or urls detected. Hint: cat domains.txt | goSubsWordlist")
 		flag.Usage()
-		os.Exit(1)
+		return errors.New("No domains or urls detected. Hint: cat domains.txt | goSubsWordlist")
 	}
 
 	sc := bufio.NewScanner(os.Stdin)
@@ -127,9 +127,11 @@ func Cli(includeRoot, silent bool) {
 
 	// check there were no errors reading stdin (unlikely)
 	if err := sc.Err(); err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	// Wait until the output waitgroup is done
 	outputWG.Wait()
+
+	return nil
 }
