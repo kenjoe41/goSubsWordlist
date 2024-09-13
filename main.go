@@ -8,16 +8,17 @@ import (
 )
 
 func main() {
-	// Include the Root Domain names in words
-	var includeRoot bool
-	flag.BoolVar(&includeRoot, "iR", false, "Include root domain names in wordlist.")
+	includeRoot, silent := parseFlags()
 
-	// Silent flag, no print banner.
-	var silent bool
-	flag.BoolVar(&silent, "silent", false, "Don't print the banner.")
-
-	flag.Parse()
 	if err := cli.Cli(includeRoot, silent); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func parseFlags() (bool, bool) {
+	var includeRoot, silent bool
+	flag.BoolVar(&includeRoot, "iR", false, "Include root domain names in wordlist.")
+	flag.BoolVar(&silent, "silent", false, "Don't print the banner.")
+	flag.Parse()
+	return includeRoot, silent
 }

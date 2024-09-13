@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/elliotwutingfeng/go-fasttld v0.4.4
 	github.com/fatih/color v1.15.0
+	golang.org/x/term v0.6.0
 )
 
 require (

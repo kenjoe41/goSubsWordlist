@@ -1,9 +1,20 @@
 package output
 
-import "github.com/fatih/color"
+import (
+	"os"
+
+	"github.com/fatih/color"
+	"golang.org/x/term"
+)
 
 // Beautify prints the banner
 func Beautify() {
+	// Check if output is a terminal (TTY)
+	if !term.IsTerminal(int(os.Stdout.Fd())) {
+		// Do not print the banner if output is redirected
+		return
+	}
+
 	banner1 := "          __                           \n"
 	banner2 := "    _  _ (_    |_  _|  | _  _ _||. _|_ \n"
 	banner3 := "   (_)(_)__)|_||_)_)|/\\|(_)| (_|||_)|_ \n"

@@ -2,8 +2,8 @@ package cli
 
 import (
 	"bufio"
+	"context"
 	"errors"
-	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -16,122 +16,112 @@ import (
 	"github.com/kenjoe41/goSubsWordlist/output"
 )
 
-// Cli accepts a list of URLs, one URL per line, from stdin and generates a wordlist from all subdomains found in the list.
 func Cli(includeRoot, silent bool) error {
-	// Print Header text
 	if !silent {
 		output.Beautify()
 	}
 
-	// This is a CPU-bound task, increasing the threads beyond what's available will just make it slow so removed the flag option.
 	concurrency := runtime.NumCPU()
-
-	// This is divided up in the subroutine for loop, so a value below 2 is BS.
 	if concurrency < 2 {
 		concurrency = 2
-	} else {
-		// We have 2 channels to share the concurrency with, let's reassure them that they'll have equal share.
-		concurrency *= 2
 	}
 
-	// Create channels to use
+	// Channels and WaitGroups
 	domains := make(chan string)
 	subdomains := make(chan string)
-	output := make(chan string)
+	words := make(chan string)
 
-	// Domain Input worker
-	var domainsWG sync.WaitGroup
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	var wg sync.WaitGroup
+
+	// Domain input workers
+	wg.Add(concurrency / 2)
 	for i := 0; i < concurrency/2; i++ {
-		domainsWG.Add(1)
-
-		go func() {
-			extract, err := fasttld.New(fasttld.SuffixListParams{})
-			if err != nil {
-				log.Fatal(err) // unlikely
-			}
-			for domain := range domains {
-				if domain == "" {
-					// Log something but continue to next domain if available
-					// log.Printf("Failed to get domain from: %s", domain)
-					continue
-				}
-				subdomain := ezutils.ExtractSubdomain(domain, includeRoot, extract)
-
-				if subdomain == "" {
-					// Log something but continue to next domain if available
-					// log.Printf("Failed to get subdomain for domain: %s", domain)
-					continue
-				}
-				subdomains <- subdomain
-			}
-			domainsWG.Done()
-		}()
+		go processDomains(ctx, &wg, domains, subdomains, includeRoot)
 	}
 
-	var subdomainsWG sync.WaitGroup
-
+	// Subdomain processing workers
+	wg.Add(concurrency / 2)
 	for i := 0; i < concurrency/2; i++ {
-		subdomainsWG.Add(1)
-
-		go func() {
-			for inSubdomains := range subdomains {
-				// Split the subdomain into separate words by the '.' char.
-				// Returns slice of words.
-				subWords := strings.Split(inSubdomains, ".")
-
-				// Print to console for now
-				for _, subword := range subWords {
-					output <- subword
-				}
-			}
-			subdomainsWG.Done()
-		}()
+		go processSubdomains(ctx, &wg, subdomains, words)
 	}
 
-	// Close subdomains channel when done reading from domains chan.
+	// Output processor
 	go func() {
-		domainsWG.Wait()
-		close(subdomains)
-	}()
-
-	var outputWG sync.WaitGroup
-	outputWG.Add(1)
-	go func() {
-		for word := range output {
+		for word := range words {
 			fmt.Println(word)
 		}
-		outputWG.Done()
 	}()
 
-	// Close the Output Chan after subdomain worker is done.
-	go func() {
-		subdomainsWG.Wait()
-		close(output)
-	}()
-
-	// Check for stdin input
-	stat, _ := os.Stdin.Stat()
-	if (stat.Mode() & os.ModeCharDevice) != 0 {
-		flag.Usage()
-		return errors.New("No domains or urls detected. Hint: cat domains.txt | goSubsWordlist")
-	}
-
-	sc := bufio.NewScanner(os.Stdin)
-
-	for sc.Scan() {
-		domains <- sc.Text()
-	}
-
-	// Close domains chan
-	close(domains)
-
-	// check there were no errors reading stdin (unlikely)
-	if err := sc.Err(); err != nil {
+	// Read input from stdin
+	if err := readStdin(domains); err != nil {
 		return err
 	}
+	close(domains)
 
-	// Wait until the output waitgroup is done
-	outputWG.Wait()
+	// Wait for workers to complete
+	wg.Wait()
+	close(subdomains)
+	close(words)
+
+	return nil
+}
+
+func processDomains(ctx context.Context, wg *sync.WaitGroup, domains <-chan string, subdomains chan<- string, includeRoot bool) {
+	defer wg.Done()
+	extract, err := fasttld.New(fasttld.SuffixListParams{})
+	if err != nil {
+		log.Fatal(err) // unlikely
+	}
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case domain, ok := <-domains:
+			if !ok {
+				return
+			}
+			if subdomain := ezutils.ExtractSubdomain(domain, includeRoot, extract); subdomain != "" {
+				subdomains <- subdomain
+			}
+		}
+	}
+}
+
+func processSubdomains(ctx context.Context, wg *sync.WaitGroup, subdomains <-chan string, words chan<- string) {
+	defer wg.Done()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case subdomain, ok := <-subdomains:
+			if !ok {
+				return
+			}
+			subWords := strings.Split(subdomain, ".")
+			for _, word := range subWords {
+				words <- word
+			}
+		}
+	}
+}
+
+func readStdin(domains chan<- string) error {
+	stat, _ := os.Stdin.Stat()
+	if (stat.Mode() & os.ModeCharDevice) != 0 {
+		return errors.New("No domains or URLs detected. Hint: cat domains.txt | goSubsWordlist")
+	}
+
+	scanner := bufio.NewScanner(os.Stdin)
+	for scanner.Scan() {
+		domains <- scanner.Text()
+	}
+
+	if err := scanner.Err(); err != nil {
+		return err
+	}
 
 	return nil
 }
