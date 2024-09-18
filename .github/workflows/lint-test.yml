@@ -12,7 +12,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v6.x.x
+        uses: golangci/golangci-lint-action@v6.0.0
         with:
           version: latest
           args: --timeout 5m
