@@ -10,9 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v3.x.x
+        uses: golangci/golangci-lint-action@v6.x.x
         with:
           version: latest
           args: --timeout 5m
