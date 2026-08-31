@@ -26,5 +26,5 @@ func Beautify() {
 	bannerPart1 := banner1 + banner2 + banner3 + banner4
 	bannerPart2 := banner5 + banner6 + banner7 + banner8
 	color.Cyan("%s\n", bannerPart1)
-	color.New().Println(bannerPart2)
+	_, _ = color.New().Println(bannerPart2)
 }

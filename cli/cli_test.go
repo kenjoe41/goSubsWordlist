@@ -97,7 +97,7 @@ func mockStdin(t *testing.T, dummyInput string) (funcDefer func(), err error) {
 	return func() {
 		// Clean up
 		os.Stdin = oldOsStdin
-		tmpfile.Close()
-		os.Remove(tmpfile.Name())
+		_ = tmpfile.Close()
+		_ = os.Remove(tmpfile.Name())
 	}, nil
 }
